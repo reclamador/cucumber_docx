@@ -28,17 +28,41 @@ router.post('/', function(req, res, next) {
             new_path = path.join(process.env.PWD, '/uploads/', file_name + '.' + file_ext);
 
         fs.readFile(old_path, function(err, data) {
-            fs.writeFile(new_path, data, function(err) {
-                fs.unlink(old_path, function(err) {
-                    if (err) {
-                        res.status(500);
-                        res.json({'success': false});
-                    } else {
-                        res.status(200);
-                        res.json({'success': true});
-                    }
-                });
+
+            var zip = new JSZip(data);
+            var doc = new Docxtemplater();
+            doc.loadZip(zip);
+
+            //set the templateVariables
+            doc.setData({
+                first_name: 'John',
+                last_name: 'Doe',
+                phone: '0652455478',
+                description: 'New Website'
             });
+
+            try {
+                // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
+                doc.render()
+            }
+            catch (error) {
+                var e = {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                    properties: error.properties
+                };
+                console.log(JSON.stringify({error: e}));
+                // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
+                throw error;
+            }
+
+            var buf = doc.getZip()
+                .generate({type: 'nodebuffer'});
+
+            // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
+            fs.writeFileSync(path.resolve(path.join(process.env.PWD, '/uploads/'), 'output.docx'), buf);
+
         });
     });
 });
