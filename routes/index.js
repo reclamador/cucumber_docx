@@ -23,15 +23,10 @@ router.post('/', function(req, res, next) {
         var context = JSON.parse(fields.context);
 
         // `file` is the name of the <input> field of type `file`
-        var old_path = files.file.path,
-            file_size = files.file.size,
-            file_ext = files.file.name.split('.').pop(),
-            index = old_path.lastIndexOf('/') + 1,
-            file_name = old_path.substr(index),
-            new_path = path.join(process.env.PWD, '/uploads/', file_name + '.' + file_ext);
+        var uploaded_path = files.file.path
+        fs.readFile(uploaded_path, function(err, data) {
 
-        fs.readFile(old_path, function(err, data) {
-
+            // Load uploaded file
             var zip = new JSZip(data);
             var doc = new Docxtemplater();
             doc.loadZip(zip);
@@ -51,8 +46,9 @@ router.post('/', function(req, res, next) {
                     properties: error.properties
                 };
                 console.log(JSON.stringify({error: e}));
-                // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
-                throw error;
+                // The error contains additional information when logged with JSON.stringify (it contains a property object).
+                res.status(500);
+                res.json({'success': false});
             }
 
             var buf = doc.getZip()
@@ -66,8 +62,10 @@ router.post('/', function(req, res, next) {
                 res.json({'success': false});
             }
 
+            // Send output docx file
             res.status(200);
-            res.json({'success': true});
+            res.write(buf,'binary');
+            res.end(null, 'binary');
 
         });
     });
