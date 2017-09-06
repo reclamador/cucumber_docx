@@ -2,4 +2,12 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  form(method='POST', action='/' enctype='multipart/form-data')
+    div.form-group
+      label(for='context') Context:
+      input#context.form-control(type='text', placeholder='json dict' name='context')
+    div.form-group
+      label(for='file') DOCX:
+      input#file.form-control(type='file', placeholder='docx file' name='file')
+
+    button.btn.btn-primary(type='submit') Parse

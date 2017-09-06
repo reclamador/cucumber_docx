@@ -11,7 +11,7 @@ var Docxtemplater = require('docxtemplater');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Docx parser tester' });
 });
 
 
@@ -63,6 +63,10 @@ router.post('/', function(req, res, next) {
             }
 
             // Send output docx file
+            res.setHeader('Content-Disposition', 'attachment; filename=docx_file_replaced.docx');
+            res.setHeader('Content-Transfer-Encoding', 'binary');
+            res.setHeader('Content-Type', ' application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+
             res.status(200);
             res.write(buf,'binary');
             res.end(null, 'binary');
