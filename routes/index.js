@@ -19,6 +19,9 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+
+        var context = JSON.parse(fields.context);
+
         // `file` is the name of the <input> field of type `file`
         var old_path = files.file.path,
             file_size = files.file.size,
@@ -34,12 +37,7 @@ router.post('/', function(req, res, next) {
             doc.loadZip(zip);
 
             //set the templateVariables
-            doc.setData({
-                first_name: 'John',
-                last_name: 'Doe',
-                phone: '0652455478',
-                description: 'New Website'
-            });
+            doc.setData(context);
 
             try {
                 // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
@@ -60,8 +58,16 @@ router.post('/', function(req, res, next) {
             var buf = doc.getZip()
                 .generate({type: 'nodebuffer'});
 
-            // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
-            fs.writeFileSync(path.resolve(path.join(process.env.PWD, '/uploads/'), 'output.docx'), buf);
+            try {
+                // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
+                fs.writeFileSync(path.resolve(path.join(process.env.PWD, '/uploads/'), 'output.docx'), buf);
+            } catch (err) {
+                res.status(500);
+                res.json({'success': false});
+            }
+
+            res.status(200);
+            res.json({'success': true});
 
         });
     });
