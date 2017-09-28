@@ -48,7 +48,7 @@ router.post('/', function(req, res, next) {
                 console.log(JSON.stringify({error: e}));
                 // The error contains additional information when logged with JSON.stringify (it contains a property object).
                 res.status(500);
-                res.json({'success': false});
+                return res.json({'success': false});
             }
 
             var buf = doc.getZip()
@@ -59,7 +59,7 @@ router.post('/', function(req, res, next) {
                 fs.writeFileSync(path.resolve(path.join(process.env.PWD, '/uploads/'), 'output.docx'), buf);
             } catch (err) {
                 res.status(500);
-                res.json({'success': false});
+                return res.json({'success': false});
             }
 
             // Send output docx file
