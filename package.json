@@ -28,6 +28,13 @@
     "type": "git",
     "url": "https://github.com/reclamador/cucumber_docx"
   },
-  "keywords": ["node", "express", "heroku", "docx", "parser", "docxparser"],
+  "keywords": [
+    "node",
+    "express",
+    "docker",
+    "docx",
+    "parser",
+    "docxparser"
+  ],
   "license": "MIT"
 }
