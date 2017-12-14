@@ -19,11 +19,26 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-
-        var context = JSON.parse(fields.context);
+        var context;
 
         // `file` is the name of the <input> field of type `file`
         var uploaded_path = files.file.path
+        try {
+            context = JSON.parse(fields.context);
+        }
+        catch(parseError) {
+            var e = {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+                properties: error.properties
+            };
+            console.log(JSON.stringify({error: e}));
+            // The error contains additional information when logged with JSON.stringify (it contains a property object).
+            res.status(500);
+            return res.json({'success': false});
+        }
+
         fs.readFile(uploaded_path, function(err, data) {
 
             // Load uploaded file
