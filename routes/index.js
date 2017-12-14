@@ -28,12 +28,12 @@ router.post('/', function(req, res, next) {
         }
         catch(parseError) {
             var e = {
-                message: error.message,
-                name: error.name,
-                stack: error.stack,
-                properties: error.properties
+                message: parseError.message,
+                name: parseError.name,
+                stack: parseError.stack,
+                properties: parseError.properties
             };
-            console.log(JSON.stringify({error: e}));
+            console.log(JSON.stringify({parseError: e}));
             // The error contains additional information when logged with JSON.stringify (it contains a property object).
             res.status(500);
             return res.json({'success': false});
