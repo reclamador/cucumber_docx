@@ -9,14 +9,13 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 
 var Raven = require('raven');
+require('dotenv').config();
 
 var app = express();
 
-
 // Raven setup, for sentry
-var dsn = process.env.DSN
+var dsn = process.env.DSN;
 Raven.config(dsn).install();
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
