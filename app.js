@@ -15,12 +15,7 @@ require('dotenv').config();
 var Raven = require('raven');
 
 // Must configure Raven before doing anything else with it
-var dsn = process.env.DSN;
-Raven.config(dsn, {
-    autoBreadcrumbs: {
-        http: true
-    }
-}).install();
+Raven.config().install();
 
 winston.emitErrs = true;
 
@@ -44,7 +39,7 @@ var logger = new winston.Logger({
         }),
         new Sentry({
             level: 'error',
-            dsn: dsn,
+            dsn: process.env.SENTRY_DSN,
             tags: {key: 'value'},
             extra: {key: 'value'}
         })

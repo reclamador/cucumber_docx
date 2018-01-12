@@ -1,3 +1,5 @@
+RUN npm install pm2 -g
+
 FROM node:carbon
 
 # Create app directory
@@ -16,4 +18,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 3000
-CMD [ "npm", "start" ]
+CMD ["pm2-runtime", "bin/www.js"]
