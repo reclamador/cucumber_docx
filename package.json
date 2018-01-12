@@ -24,7 +24,9 @@
     "morgan": "~1.8.1",
     "path": "^0.12.7",
     "raven": "^2.2.1",
-    "serve-favicon": "~2.4.2"
+    "serve-favicon": "~2.4.2",
+    "winston": "^2.4.0",
+    "winston-sentry": "^0.2.1"
   },
   "repository": {
     "type": "git",
