@@ -17,12 +17,28 @@ router.get('/', function(req, res, next) {
 
 /* POST upload file */
 router.post('/', function(req, res, next) {
+
     var form = new formidable.IncomingForm();
+
+    // Callback to answer inconming POST request
     form.parse(req, function(err, fields, files) {
+        // Error detected: pass to next route handler
         if (err) next(err);
+
         var context;
-        // `file` is the name of the <input> field of type `file`
-        var uploaded_path = files.file.path;
+        var uploaded_path;
+
+        // Get file
+        try {
+            uploaded_path = files.file.path;
+        } catch(typeError) {
+            res.status(400);
+            return res.json({'success': false, 'reason': 'empty file'})
+        }
+
+         console.log(uploaded_path);
+
+        // Get context
         try {
             context = JSON.parse(fields.context);
         }
@@ -35,19 +51,31 @@ router.post('/', function(req, res, next) {
             };
             console.log(JSON.stringify({parseError: e}));
             // The error contains additional information when logged with JSON.stringify (it contains a property object).
-            res.status(500);
-            return res.json({'success': false});
+            res.status(400);
+            return res.json({'success': false, 'reason': 'invalid context data: ' + e.message});
         }
 
+        // Read file sent
         fs.readFile(uploaded_path, function(err, data) {
+            if (err) {
+                res.status(500);
+                return res.json({'success': false, 'reason': 'error reading input file'})
+            }
 
-            // Load uploaded file
-            var zip = new JSZip(data);
-            var doc = new Docxtemplater();
-            doc.loadZip(zip);
+            var zip;
+            var doc;
+            var buf;
 
-            //set the templateVariables
-            doc.setData(context);
+            // Load uploaded file and set the template variables
+            try {
+                zip = new JSZip(data);
+                doc = new Docxtemplater();
+                doc.loadZip(zip);
+                doc.setData(context);
+            } catch (e) {
+                res.status(500);
+                return res.json({'success': false, 'reason': 'error loading input file'})
+            }
 
             try {
                 // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
@@ -63,18 +91,17 @@ router.post('/', function(req, res, next) {
                 console.log(JSON.stringify({error: e}));
                 // The error contains additional information when logged with JSON.stringify (it contains a property object).
                 res.status(500);
-                return res.json({'success': false});
+                return res.json({'success': false, 'reason': 'error replacing vars'});
             }
 
-            var buf = doc.getZip()
-                .generate({type: 'nodebuffer'});
-
+            // generate output data
             try {
+                buf = doc.getZip().generate({type: 'nodebuffer'});
                 // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
                 fs.writeFileSync(path.resolve(path.join(process.env.PWD, '/uploads/'), 'output.docx'), buf);
             } catch (err) {
                 res.status(500);
-                return res.json({'success': false});
+                return res.json({'success': false, 'reason': 'error generating output file'});
             }
 
             // Send output docx file
