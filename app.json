@@ -1,0 +1,8 @@
+{
+  "name": "Cucumber Docx: A DocX parser",
+  "description": "express API endpoint to send docx files containing vars + dict context and returns a docx with the vars replaced. It uses docxtemplater node library.",
+  "repository": "https://github.com/reclamador/cucumber_docx",
+  "logo": "https://avatars3.githubusercontent.com/u/22814179?v=4&s=200",
+  "keywords": ["node", "express", "heroku", "docx", "parser", "docxparser"],
+  "image": "heroku/nodejs"
+}
