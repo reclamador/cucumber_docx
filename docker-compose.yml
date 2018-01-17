@@ -4,6 +4,6 @@ cucumberdocx:
     - .env
   volumes:
     - .:/usr/src/app
-    - ./node-modules
+    - /usr/src/node_modules
   ports:
     - "8001:3000"
