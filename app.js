@@ -155,7 +155,7 @@ app.post('/', function (req, res, next) {
             try {
                 buf = doc.getZip().generate({type: 'nodebuffer'});
                 // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
-                fs.writeFileSync(path.resolve(path.join(process.env.PWD, '/uploads/'), 'output.docx'), buf);
+                fs.writeFileSync(path.resolve(path.join(process.cwd(), '/uploads/'), 'output.docx'), buf);
             } catch (err) {
                 logger.error('error generating output file: ' + err.message);
                 res.status(500);
