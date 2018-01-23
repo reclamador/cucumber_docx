@@ -1,9 +1,8 @@
-cucumberdocx:
-  build: .
-  env_file:
-    - .env
-  volumes:
-    - .:/usr/src/app
-    - /usr/src/node_modules
-  ports:
-    - "8001:3000"
+version: "2"
+
+services:
+  app:
+    build: .
+    env_file: .env
+    ports:
+      - "8001:3000"
