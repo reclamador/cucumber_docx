@@ -5,8 +5,5 @@ services:
     restart: always
     build: .
     env_file: .env
-    volumes:
-        - .:/usr/src/app
-        - /usr/src/node_modules
     ports:
       - "8000:3000"
