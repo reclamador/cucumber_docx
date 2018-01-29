@@ -15,7 +15,7 @@ require('dotenv').config();
 var Raven = require('raven');
 
 // Must configure Raven before doing anything else with it
-Raven.config().install();
+Raven.config(process.env.SENTRY_DSN).install();
 
 winston.emitErrs = true;
 
