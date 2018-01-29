@@ -12,6 +12,8 @@ var winston = require('winston');
 var Sentry = require('winston-sentry');
 var Raven = require('raven');
 
+console.log("Sentry DSN: " + process.env.SENTRY_DSN);
+
 // Must configure Raven before doing anything else with it
 Raven.config(process.env.SENTRY_DSN).install();
 
