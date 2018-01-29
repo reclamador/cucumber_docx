@@ -10,8 +10,6 @@ var JSZip = require('jszip');
 var Docxtemplater = require('docxtemplater');
 var winston = require('winston');
 var Sentry = require('winston-sentry');
-
-require('dotenv').config();
 var Raven = require('raven');
 
 // Must configure Raven before doing anything else with it

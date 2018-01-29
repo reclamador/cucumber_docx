@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var nr = require('newrelic');
+require('dotenv').config();
 var app = require('../app');
 var debug = require('debug')('node-express:server');
 var http = require('http');
