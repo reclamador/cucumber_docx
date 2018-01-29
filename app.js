@@ -37,7 +37,7 @@ var logger = new winston.Logger({
         }),
         new Sentry({
             level: 'error',
-            dsn: '"' + process.env.SENTRY_DSN + '"',
+            dsn: process.env.SENTRY_DSN,
             tags: {key: 'value'},
             extra: {key: 'value'}
         })
