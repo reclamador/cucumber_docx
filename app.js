@@ -9,7 +9,7 @@ var http = require('http');
 var JSZip = require('jszip');
 var Docxtemplater = require('docxtemplater');
 var winston = require('winston');
-var Sentry = require('winston-sentry');
+var Sentry = require('winston-raven-sentry');
 var Raven = require('raven');
 
 // Must configure Raven before doing anything else with it
@@ -37,9 +37,7 @@ var logger = new winston.Logger({
         }),
         new Sentry({
             level: 'error',
-            dsn: process.env.SENTRY_DSN,
-            tags: {key: 'value'},
-            extra: {key: 'value'}
+            dsn: process.env.SENTRY_DSN
         })
     ],
     exitOnError: false

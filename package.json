@@ -27,6 +27,7 @@
     "raven": "^2.2.1",
     "serve-favicon": "~2.4.2",
     "winston": "^2.4.0",
+    "winston-raven-sentry": "^1.0.1",
     "winston-sentry": "^0.2.1"
   },
   "repository": {
