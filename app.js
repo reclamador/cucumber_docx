@@ -37,7 +37,7 @@ var logger = new winston.Logger({
         }),
         new Sentry({
             level: 'error',
-            dsn: process.env.SENTRY_DSN,
+            dsn: '"' + process.env.SENTRY_DSN + '"',
             tags: {key: 'value'},
             extra: {key: 'value'}
         })
@@ -86,7 +86,7 @@ app.post('/', function (req, res, next) {
         try {
             uploaded_path = files.file.path;
         } catch (typeError) {
-            logger.sentry_client.error('empty file');
+            logger.error('empty file');
             res.status(400);
             return res.json({'success': false, 'reason': 'empty file'})
         }
@@ -102,7 +102,7 @@ app.post('/', function (req, res, next) {
                 stack: parseError.stack,
                 properties: parseError.properties
             };
-            logger.sentry_client.error(JSON.stringify({parseError: e}));
+            logger.error(JSON.stringify({parseError: e}));
             // The error contains additional information when logged with JSON.stringify (it contains a property object).
             res.status(400);
             return res.json({'success': false, 'reason': 'invalid context data: ' + e.message});
@@ -111,7 +111,7 @@ app.post('/', function (req, res, next) {
         // Read file sent
         fs.readFile(uploaded_path, function (err, data) {
             if (err) {
-                logger.sentry_client.error('error reading input file: ' + err.message);
+                logger.error('error reading input file: ' + err.message);
                 res.status(500);
                 return res.json({'success': false, 'reason': 'error reading input file'})
             }
@@ -127,7 +127,7 @@ app.post('/', function (req, res, next) {
                 doc.loadZip(zip);
                 doc.setData(context);
             } catch (e) {
-                logger.sentry_client.error('error loading input file: ' + e.message);
+                logger.error('error loading input file: ' + e.message);
                 res.status(500);
                 return res.json({'success': false, 'reason': 'error loading input file'})
             }
@@ -143,7 +143,7 @@ app.post('/', function (req, res, next) {
                     stack: error.stack,
                     properties: error.properties
                 };
-                logger.sentry_client.error(JSON.stringify({error: e}));
+                logger.error(JSON.stringify({error: e}));
                 // The error contains additional information when logged with JSON.stringify (it contains a property object).
                 res.status(500);
                 return res.json({'success': false, 'reason': 'error replacing vars'});
@@ -155,7 +155,7 @@ app.post('/', function (req, res, next) {
                 // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
                 fs.writeFileSync(path.resolve(path.join(process.cwd(), '/uploads/'), 'output.docx'), buf);
             } catch (err) {
-                logger.sentry_client.error('error generating output file: ' + err.message);
+                logger.error('error generating output file: ' + err.message);
                 res.status(500);
                 return res.json({'success': false, 'reason': 'error generating output file'});
             }
