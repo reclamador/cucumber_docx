@@ -2,59 +2,49 @@ var googleapis = require('googleapis');
 var googleAuth = require('google-auth-library');
 var fs = require('fs');
 
+var scopes = [
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.appdata',
+    'https://www.googleapis.com/auth/drive.file',
+    'https://www.googleapis.com/auth/drive.metadata',
+    'https://www.googleapis.com/auth/drive.metadata.readonly',
+    'https://www.googleapis.com/auth/drive.photos.readonly',
+    'https://www.googleapis.com/auth/drive.readonly'
+];
+
+var email = 'SERVICE_ACCOUNT_EMAIL';
+
 (function () {
     "use strict";
 
-// Load client secrets from a local file.
-    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+    // Need drive_key.pem
+    var jwt = new googleapis.auth.JWT(email,'./drive_key.pem',null,scopes);
+    jwt.authorize(function (err) {
         if (err) {
-            console.log('Error loading client secret file: ' + err);
+            console.log(err);
             return;
         }
 
-// Authorize a client with the loaded credentials, then call the
-// Drive API.
-        authorize(JSON.parse(content));
-    });
+        // Make an authorized request to list Drive files.
+        var service = googleapis.drive('v2');
 
-    var authorize = function (credentials) {
-        var auth = new googleAuth();
-        var oauth2Client = new auth.OAuth2();
-        var jwt = new googleapis.auth.JWT(
-            credentials.client_email,
-            null,
-            credentials.private_key,
-            ['https://www.googleapis.com/auth/drive']);
-
-        jwt.authorize(function (err, tokens) {
+        service.files.get({
+            auth: jwt,
+            fileId: "ONE_FILE_DRIVE_KEY"
+        }, function(err, response) {
             if (err) {
-                console.log(err);
+                console.log('The API returned an error: ' + err);
                 return;
             }
 
-            // Make an authorized request to list Drive files.
-            var service = googleapis.drive('v2');
+            var data = response.data;
+            console.log(data.title);
 
-            service.files.list({
-                auth: jwt,
-                maxResults: 10,
-            }, function (err, response) {
-                if (err) {
-                    console.log('The API returned an error: ' + err);
-                    return;
-                }
+            // To export file instead of read title:
+            // https://github.com/google/google-api-nodejs-client/blob/master/samples/drive/export.js
 
-                var files = response.data.items;
-                if (files.length === 0) {
-                    console.log('No files found.');
-                } else {
-                    console.log('Files:');
-                    for (var i = 0; i < files.length; i++) {
-                        var file = files[i];
-                        console.log('%s (%s)', file.title, file.id);
-                    }
-                }
-            });
         });
-    };
+
+    });
+
 })();
