@@ -14,6 +14,8 @@ var scopes = [
 
 var email = 'SERVICE_ACCOUNT_EMAIL';
 
+var fileId = "DRIVE_KEY";
+
 (function () {
     "use strict";
 
@@ -25,23 +27,48 @@ var email = 'SERVICE_ACCOUNT_EMAIL';
             return;
         }
 
-        // Make an authorized request to list Drive files.
+        // Create a service to connect with Google Drive API v2
         var service = googleapis.drive('v2');
 
+        // Get file's metadata
         service.files.get({
             auth: jwt,
-            fileId: "ONE_FILE_DRIVE_KEY"
-        }, function(err, response) {
+            fileId: fileId
+        }, function(err, metadata) {
             if (err) {
                 console.log('The API returned an error: ' + err);
                 return;
             }
 
-            var data = response.data;
-            console.log(data.title);
+            console.log(metadata.data.title);
 
-            // To export file instead of read title:
-            // https://github.com/google/google-api-nodejs-client/blob/master/samples/drive/export.js
+            // Build an output stream with the file's name
+            var wstream = fs.createWriteStream(metadata.data.title + '.pdf');
+
+            // Now, download file
+            service.files.export({
+                auth: jwt,
+                fileId: fileId,
+                //mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                mimeType: 'application/pdf'
+            }, {
+                encoding: null // Make sure we get the binary data
+            }, function(err, buffer) {
+                if (err) {
+                    console.log('The API returned an error: ' + err);
+                    return;
+                };
+
+                wstream.write(buffer.data);
+                wstream.end();
+            }).on('end', function () {
+                console.log('Done');
+            })
+                .on('error', function (err) {
+                    console.log('Error during download', err);
+                })
+                .pipe(dest);
+
 
         });
 
