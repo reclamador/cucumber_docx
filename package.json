@@ -1,7 +1,7 @@
 {
   "name": "cucumber-docx",
   "description": "express API endpoint to send docx files containing vars + dict context and returns a docx with the vars replaced. It uses docxtemplater node library.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "engines": {
     "node": "6.10.0"
   },
