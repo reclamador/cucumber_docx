@@ -11,6 +11,7 @@ var Docxtemplater = require('docxtemplater');
 var winston = require('winston');
 var Sentry = require('winston-raven-sentry');
 var Raven = require('raven');
+var expressions = require('angular-expressions');
 
 // Must configure Raven before doing anything else with it
 Raven.config(process.env.SENTRY_DSN).install();
@@ -42,6 +43,29 @@ var logger = new winston.Logger({
     ],
     exitOnError: false
 });
+
+// Expression needed to be able to write {clientame | lower}
+expressions.filters.lower = function(input) {
+    // This condition should be used to make sure that if your input is undefined, your output will be undefined as well and will not throw an error
+    if(!input) return input;
+    return input.toLowerCase();
+};
+
+expressions.filters.upper = function(input) {
+    // This condition should be used to make sure that if your input is undefined, your output will be undefined as well and will not throw an error
+    if(!input) return input;
+    return input.toUpperCase();
+};
+
+
+var angularParser = function(tag) {
+    return {
+        get: tag === '.' ? function(s){ return s;} : function(s) {
+            return expressions.compile(tag.replace(/(’|“|”)/g, "'"))(s);
+        }
+    };
+};
+
 
 // Instance express
 var app = express();
@@ -122,7 +146,7 @@ app.post('/', function (req, res, next) {
             try {
                 zip = new JSZip(data);
                 doc = new Docxtemplater();
-                doc.loadZip(zip);
+                doc.loadZip(zip).setOptions({parser: angularParser});
                 doc.setData(context);
             } catch (e) {
                 logger.error('error loading input file: ' + e.message);
