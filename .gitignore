@@ -59,3 +59,10 @@ typings/
 
 # Webstorm stuff
 .idea
+
+# Avoid to include sensible files by error
+*.p12
+*.pem
+
+# Avoid to include output file
+uploads/output.docx
